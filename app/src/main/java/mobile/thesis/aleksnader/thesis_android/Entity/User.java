@@ -7,7 +7,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
  * Wojskowa Akademia Techniczna im. Jarosława Dąbrowskiego, Warszawa 2017r.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
-public class Person {
+public class User {
 
     private String name;
     private String subname;
