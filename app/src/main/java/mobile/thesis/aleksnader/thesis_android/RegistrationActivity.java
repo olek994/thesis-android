@@ -1,11 +1,11 @@
 package mobile.thesis.aleksnader.thesis_android;
 
+import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -14,15 +14,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
-import org.json.JSONException;
-import org.json.JSONObject;
+import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
+import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.web.client.RestTemplate;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -57,22 +52,41 @@ public class RegistrationActivity extends AppCompatActivity {
                         user.setEmail(emailEditText.getText().toString());
                         user.setPassword(passwordEditText.getText().toString());
 
-                        new AsyncTask<User,Void,Void>(){
+                        new AsyncTask<User,Void,Boolean>(){
+                            ProgressDialog progressDialog = null;
+                            @Override
+                            protected void onPreExecute() {
+                                super.onPreExecute();
+                                progressDialog = new ProgressDialog(RegistrationActivity.this);
+                                progressDialog.setTitle("Loading");
+                                progressDialog.setMessage("Creating user..");
+                                submitRegistrationButton.setEnabled(false);
+                                progressDialog.show();
+                            }
 
                             @Override
-                            protected Void doInBackground(User... Users) {
+                            protected Boolean doInBackground(User... Users) {
                                 User user = Users[0];
 
-                                String url = "http://192.168.0.14:8080/user/";
-                                RestTemplate restTemplate = new RestTemplate();
-                                restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+                                String url = StaticValues.URLIP+"/user/";
+                                ResponseEntity<User> response = (ResponseEntity<User>) HttpRestUtils.httpPost(url,user,User.class);
 
-                                HttpHeaders httpHeaders = new HttpHeaders();
-                                httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-                                HttpEntity<User> entity = new HttpEntity<>(user,httpHeaders);
-                                ResponseEntity<User> response = restTemplate.exchange(url, HttpMethod.POST,entity,User.class);
-                                System.out.println(response);
-                                return null;
+                                return response.getStatusCode().toString().equals("200");
+                            }
+
+                            @Override
+                            protected void onPostExecute(Boolean succese) {
+                                super.onPostExecute(succese);
+                                submitRegistrationButton.setEnabled(true);
+                                progressDialog.dismiss();
+                                if(succese){
+                                    Toast.makeText(RegistrationActivity.this, "Operacja zakończona powodzeniem", Toast.LENGTH_SHORT).show();
+                                    Intent intent = new Intent(RegistrationActivity.this,SignInActivity.class);
+                                    startActivity(intent);
+
+                                }else{
+                                    Toast.makeText(RegistrationActivity.this, "Wystąpił błąd. Spróbuj ponownie...", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         }.execute(user);
 

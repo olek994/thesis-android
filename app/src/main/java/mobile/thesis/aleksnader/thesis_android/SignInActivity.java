@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
+import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
+import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -53,9 +55,7 @@ public class SignInActivity extends AppCompatActivity {
                         @Override
                         protected User doInBackground(String... strings) {
                             String url = strings[0];
-                            RestTemplate restTemplate = new RestTemplate();
-                            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-                            User user = restTemplate.getForObject(url,User.class);
+                            User user = (User) HttpRestUtils.httpGet(url,User.class);
                             return user;
                         }
 
@@ -69,7 +69,7 @@ public class SignInActivity extends AppCompatActivity {
                             Toast.makeText(SignInActivity.this, user.getName()+", "+user.getSubname(), Toast.LENGTH_SHORT).show();
 
                         }
-                    }.execute("http://192.168.0.14:8080/user/signin/"+email+"/"+password);
+                    }.execute(StaticValues.URLIP+"/user/signin/"+email+"/"+password);
                 }
 
             }
