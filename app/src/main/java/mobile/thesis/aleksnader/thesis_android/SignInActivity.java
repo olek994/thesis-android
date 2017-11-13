@@ -16,8 +16,6 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.web.client.RestTemplate;
 
 public class SignInActivity extends AppCompatActivity {
-
-
     private Button signInButton;
     private Button openRegistrationButton;
     private EditText emailEditText;
@@ -55,7 +53,9 @@ public class SignInActivity extends AppCompatActivity {
                         @Override
                         protected User doInBackground(String... strings) {
                             String url = strings[0];
-                            User user = (User) HttpRestUtils.httpGet(url,User.class);
+                            User user = null;
+
+                            user = (User) HttpRestUtils.httpGet(url, User.class);
                             return user;
                         }
 
@@ -66,7 +66,14 @@ public class SignInActivity extends AppCompatActivity {
                             emailEditText.setText("");
                             passwordEditText.setText("");
                             signInButton.setEnabled(true);
-                            Toast.makeText(SignInActivity.this, user.getName()+", "+user.getSubname(), Toast.LENGTH_SHORT).show();
+                            if (user != null) {
+                                Intent intent = new Intent(SignInActivity.this,MainActivity.class);
+                                intent.putExtra("LoggedUser",user);
+                                startActivity(intent);
+
+                            }else{
+                                Toast.makeText(SignInActivity.this, "Operacja zakończona niepowodzeniem", Toast.LENGTH_SHORT).show();
+                            }
 
                         }
                     }.execute(StaticValues.URLIP+"/user/signin/"+email+"/"+password);

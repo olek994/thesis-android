@@ -81,8 +81,7 @@ public class RegistrationActivity extends AppCompatActivity {
                                 progressDialog.dismiss();
                                 if(succese){
                                     Toast.makeText(RegistrationActivity.this, "Operacja zakończona powodzeniem", Toast.LENGTH_SHORT).show();
-                                    Intent intent = new Intent(RegistrationActivity.this,SignInActivity.class);
-                                    startActivity(intent);
+                                    finish();
 
                                 }else{
                                     Toast.makeText(RegistrationActivity.this, "Wystąpił błąd. Spróbuj ponownie...", Toast.LENGTH_SHORT).show();
@@ -99,40 +98,12 @@ public class RegistrationActivity extends AppCompatActivity {
             }
         });
 
-        repeatPassEditText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String value = s.toString();
-                passwordsMatch(value);
-
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-
-            }
-        });
-
 
     }
 
     private boolean passwordsMatch(String value){
         EditText passwordEditText = (EditText) findViewById(R.id.passwordEditText);
-
-        if(!passwordEditText.getText().toString().equals(value)){
-            repeatPassEditText.setTextColor(RegistrationActivity.this.getResources().getColor(R.color.wrongInputValue));
-            repeatPassEditText.setTypeface(repeatPassEditText.getTypeface(), Typeface.BOLD);
-            return false;
-        }else{
-            repeatPassEditText.setTypeface(null, Typeface.NORMAL);
-            repeatPassEditText.setTextColor(Color.BLACK);
-            return true;
-        }
+        return passwordEditText.getText().toString().equals(value);
     }
 
 }
