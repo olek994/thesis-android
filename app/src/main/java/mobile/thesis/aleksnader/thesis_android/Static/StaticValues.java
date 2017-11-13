@@ -6,5 +6,5 @@ package mobile.thesis.aleksnader.thesis_android.Static;
  */
 public class StaticValues {
 
-    public static final String URLIP = "http://192.168.0.101:8080";
+    public static final String URLIP = "http://192.168.1.21:8080";
 }
