@@ -44,8 +44,8 @@ public class SignInActivity extends AppCompatActivity {
                         protected void onPreExecute() {
                             super.onPreExecute();
                             progressDialog = new ProgressDialog(SignInActivity.this);
-                            progressDialog.setTitle("Loading");
-                            progressDialog.setMessage("Searching for Person..");
+                            progressDialog.setCancelable(false);
+                            progressDialog.setMessage("Sprawdzanie poprawności informacji..");
                             signInButton.setEnabled(false);
                             progressDialog.show();
                         }
@@ -63,12 +63,11 @@ public class SignInActivity extends AppCompatActivity {
                         protected void onPostExecute(User user) {
                             super.onPostExecute(user);
                             progressDialog.dismiss();
-                            emailEditText.setText("");
-                            passwordEditText.setText("");
                             signInButton.setEnabled(true);
                             if (user != null) {
                                 Intent intent = new Intent(SignInActivity.this,MainActivity.class);
                                 intent.putExtra("LoggedUser",user);
+                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
 
                             }else{

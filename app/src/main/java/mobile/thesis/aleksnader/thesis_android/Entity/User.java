@@ -16,7 +16,7 @@ public class User implements Serializable {
     private String subname;
     private String email;
     private String password;
-    private List<User> recipient;
+    private List<Long> recipientId;
 
 
     public String getName() {
@@ -51,11 +51,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public List<User> getRecipient() {
-        return recipient;
+    public List<Long> getRecipientId() {
+        return recipientId;
     }
 
-    public void setRecipient(List<User> recipients) {
-        this.recipient = recipients;
+    public void setRecipientId(List<Long> recipientId) {
+        this.recipientId = recipientId;
     }
 }

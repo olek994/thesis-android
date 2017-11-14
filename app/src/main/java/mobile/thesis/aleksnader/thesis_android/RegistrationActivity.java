@@ -58,8 +58,8 @@ public class RegistrationActivity extends AppCompatActivity {
                             protected void onPreExecute() {
                                 super.onPreExecute();
                                 progressDialog = new ProgressDialog(RegistrationActivity.this);
-                                progressDialog.setTitle("Loading");
-                                progressDialog.setMessage("Creating user..");
+                                progressDialog.setCancelable(false);
+                                progressDialog.setMessage("Rejestrowanie użytkownika..");
                                 submitRegistrationButton.setEnabled(false);
                                 progressDialog.show();
                             }
