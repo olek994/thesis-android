@@ -56,6 +56,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public int getItemCount() {
         return recipients.size();
     }
+
+
     public class UserViewHolder extends RecyclerView.ViewHolder{
 
         private TextView nameAndSubnameOfRecipient;

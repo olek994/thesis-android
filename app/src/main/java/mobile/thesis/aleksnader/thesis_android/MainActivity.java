@@ -1,14 +1,21 @@
 package mobile.thesis.aleksnader.thesis_android;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,18 +33,29 @@ public class MainActivity extends AppCompatActivity {
     private UserAdapter userAdapter;
     private User loggedUser;
 
+
     @SuppressLint("StaticFieldLeak")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        loggedUser = (User) getIntent().getSerializableExtra("LoggedUser");
         recyclerView = (RecyclerView) findViewById(R.id.recipients_recycler_view);
+
+
     }
 
     @Override
     protected void onStart() {
         super.onStart();
+
+        //pobranie jsona usera i dokonanie konwersji na User.class
+        int mode = Activity.MODE_PRIVATE;
+        Gson gson = new Gson();
+        SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
+        String jsonUser = sharedPreferences.getString("User", "");
+        loggedUser = gson.fromJson(jsonUser,User.class);
+
+
         if (loggedUser == null) {
             Intent intent = new Intent(this,SignInActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -77,6 +95,36 @@ public class MainActivity extends AppCompatActivity {
             }.execute(loggedUser.getRecipientId());
         }
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = new MenuInflater(this);
+        inflater.inflate(R.menu.main_menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.logoutMainMenuItem:
+
+                //usuniecie usera z sharedpreferences
+                int mode = Activity.MODE_PRIVATE;
+                SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                editor.remove("User");
+                editor.apply();
+
+                Intent intent = new Intent(this,SignInActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                break;
+            default:
+
+        }
+        return true;
+    }
+
     private  RecyclerView setConfigurationofRecyclerView(RecyclerView recyclerView, RecyclerView.Adapter adapter){
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(MainActivity.this,DividerItemDecoration.VERTICAL);
 

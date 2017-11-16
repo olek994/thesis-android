@@ -1,7 +1,9 @@
 package mobile.thesis.aleksnader.thesis_android;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import com.google.gson.Gson;
+
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
 import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
@@ -65,8 +70,17 @@ public class SignInActivity extends AppCompatActivity {
                             progressDialog.dismiss();
                             signInButton.setEnabled(true);
                             if (user != null) {
+
+                                //Dodanie do sharedPreference zalogowanego usera
+                                int mode = Activity.MODE_PRIVATE;
+                                SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
+                                SharedPreferences.Editor editor = sharedPreferences.edit();
+                                Gson gson = new Gson();
+                                String jsonUser = gson.toJson(user);
+                                editor.putString("User",jsonUser);
+                                editor.apply();
+
                                 Intent intent = new Intent(SignInActivity.this,MainActivity.class);
-                                intent.putExtra("LoggedUser",user);
                                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 startActivity(intent);
 
