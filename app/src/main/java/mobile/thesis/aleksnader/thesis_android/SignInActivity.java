@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import com.google.gson.Gson;
 
+import mobile.thesis.aleksnader.thesis_android.Entity.Token;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
 import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
@@ -42,55 +43,34 @@ public class SignInActivity extends AppCompatActivity {
             public void onClick(View v) {
                 String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
-                if(!email.isEmpty() && !password.isEmpty()){
-                    new AsyncTask<String, Void, User>() {
-                        ProgressDialog progressDialog = null;
+                if(!email.isEmpty() && !password.isEmpty()) {
+                    new AsyncTask<String, Void, Token>() {
+                        ProgressDialog progressDialog;
                         @Override
                         protected void onPreExecute() {
                             super.onPreExecute();
                             progressDialog = new ProgressDialog(SignInActivity.this);
+                            progressDialog.setMessage("Autoryzacja");
                             progressDialog.setCancelable(false);
-                            progressDialog.setMessage("Sprawdzanie poprawności informacji..");
-                            signInButton.setEnabled(false);
                             progressDialog.show();
                         }
 
                         @Override
-                        protected User doInBackground(String... strings) {
-                            String url = strings[0];
-                            User user = null;
+                        protected Token doInBackground(String... strings) {
 
-                            user = (User) HttpRestUtils.httpGet(url, User.class);
-                            return user;
+                            Token token = HttpRestUtils.getUserAccessToken(strings[0], strings[1]);
+                            System.out.println(token.getAccess_token()); //Trzeba zapisać ogolnie token (sharedPreference)
+                            return token;
                         }
 
                         @Override
-                        protected void onPostExecute(User user) {
-                            super.onPostExecute(user);
+                        protected void onPostExecute(Token token) {
+                            super.onPostExecute(token);
                             progressDialog.dismiss();
-                            signInButton.setEnabled(true);
-                            if (user != null) {
-
-                                //Dodanie do sharedPreference zalogowanego usera
-                                int mode = Activity.MODE_PRIVATE;
-                                SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
-                                SharedPreferences.Editor editor = sharedPreferences.edit();
-                                Gson gson = new Gson();
-                                String jsonUser = gson.toJson(user);
-                                editor.putString("User",jsonUser);
-                                editor.apply();
-
-                                Intent intent = new Intent(SignInActivity.this,MainActivity.class);
-                                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                startActivity(intent);
-
-                            }else{
-                                Toast.makeText(SignInActivity.this, "Operacja zakończona niepowodzeniem", Toast.LENGTH_SHORT).show();
-                            }
-
                         }
-                    }.execute(StaticValues.URLIP+"/user/signin/"+email+"/"+password);
+                    }.execute(email, password);
                 }
+
 
             }
         });

@@ -1,8 +1,9 @@
+//noinspection GradleCompatible
 apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '26.0.2'
+    buildToolsVersion "25.0.2"
     defaultConfig {
         applicationId "mobile.thesis.aleksnader.thesis_android"
         minSdkVersion 22
@@ -40,4 +41,5 @@ dependencies {
     compile 'jp.wasabeef:recyclerview-animators:2.2.3'
     compile 'com.google.code.gson:gson:2.7'
     testCompile 'junit:junit:4.12'
+    compile group: 'org.apache.oltu.oauth2', name: 'org.apache.oltu.oauth2.client', version: '1.0.2'
 }
