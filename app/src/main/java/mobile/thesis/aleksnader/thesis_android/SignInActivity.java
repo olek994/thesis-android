@@ -41,7 +41,7 @@ public class SignInActivity extends AppCompatActivity {
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String email = emailEditText.getText().toString();
+                final String email = emailEditText.getText().toString();
                 String password = passwordEditText.getText().toString();
                 if(!email.isEmpty() && !password.isEmpty()) {
                     new AsyncTask<String, Void, Token>() {
@@ -59,14 +59,26 @@ public class SignInActivity extends AppCompatActivity {
                         protected Token doInBackground(String... strings) {
 
                             Token token = HttpRestUtils.getUserAccessToken(strings[0], strings[1]);
-                            System.out.println(token.getAccess_token()); //Trzeba zapisać ogolnie token (sharedPreference)
+
                             return token;
                         }
 
                         @Override
                         protected void onPostExecute(Token token) {
                             super.onPostExecute(token);
+                            Gson gson = new Gson();
+                            String tokenJson = gson.toJson(token);
+                            int mode = MODE_PRIVATE; // TODO nie zapisywac w sharedpreference. Moe jako static w innej klasie
+                            SharedPreferences.Editor editor = getSharedPreferences("accessToken",mode).edit();
+                            editor.putString("token",tokenJson);
+                            editor.putString("userEmail",email);
+                            editor.apply();
                             progressDialog.dismiss();
+
+                            Intent mainActivityIntent = new Intent(SignInActivity.this,MainActivity.class);
+                            mainActivityIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(mainActivityIntent);
+
                         }
                     }.execute(email, password);
                 }

@@ -62,13 +62,12 @@ public class HttpRestUtils {
     }
 
     public static Token getUserAccessToken(String username, String password) {
-        String client_id = "thesis-android";
-        String secret = "thesis";
         int statusCode;
         byte[] data;
         Token token = null;
+        String authoritationCredintionals = StaticValues.CLIENT_ID+":"+StaticValues.SECRET;
         try {
-            data = "thesis-android:thesis".getBytes("UTF-8");
+            data = authoritationCredintionals.getBytes("UTF-8");
             String base64 = Base64.encodeToString(data, Base64.DEFAULT);
             URL url = new URL(StaticValues.URLIP + "/oauth/token?grant_type=password&username=" + username + "&password=" + password);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();

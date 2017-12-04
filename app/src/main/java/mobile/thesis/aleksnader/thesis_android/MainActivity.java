@@ -22,6 +22,7 @@ import java.util.List;
 
 import jp.wasabeef.recyclerview.animators.FadeInDownAnimator;
 import mobile.thesis.aleksnader.thesis_android.Adapter.UserAdapter;
+import mobile.thesis.aleksnader.thesis_android.Entity.Token;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
 import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
@@ -31,6 +32,8 @@ public class MainActivity extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
+    private Token accessToken;
+    private String userEmail;
     private User loggedUser;
 
 
@@ -48,20 +51,20 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
-        //pobranie jsona usera i dokonanie konwersji na User.class
+
         int mode = Activity.MODE_PRIVATE;
         Gson gson = new Gson();
-        SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
-        String jsonUser = sharedPreferences.getString("User", "");
-        loggedUser = gson.fromJson(jsonUser,User.class);
+        SharedPreferences sharedPreferences = getSharedPreferences("accessToken",mode);
+        String jsonToken = sharedPreferences.getString("token", "");
+        userEmail = sharedPreferences.getString("userEmail","");
+        accessToken = gson.fromJson(jsonToken,Token.class);
 
-
-        if (loggedUser == null) {
+        if (accessToken == null) {
             Intent intent = new Intent(this,SignInActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }else {
-            new AsyncTask<List<Long>, Void, List<User>>() {
+        } else {
+            new AsyncTask<Token, Void, List<User>>() {
                 ProgressDialog progressDialog;
 
                 @Override
@@ -69,16 +72,20 @@ public class MainActivity extends AppCompatActivity {
                     super.onPreExecute();
                     progressDialog = new ProgressDialog(MainActivity.this);
                     progressDialog.setCancelable(false);
-                    progressDialog.setMessage("ładowanie użytkowników..");
+                    progressDialog.setMessage("ładowanie danych..");
                     progressDialog.show();
                 }
 
                 @Override
-                protected List<User> doInBackground(List<Long>[] lists) {
-                    List<Long> ids = lists[0];
+                protected List<User> doInBackground(Token[] tokens) {
+                    Token token = tokens[0];
+
+
+                    loggedUser = (User) HttpRestUtils.httpGet(StaticValues.URLIP+"/user/email/"+userEmail+"/?access_token="+token.getAccess_token(),User.class);
+
                     List<User> users = new ArrayList<>();
-                    for (Long id : ids) {
-                        String url = StaticValues.URLIP + "/user/" + id;
+                    for (Long id : loggedUser.getRecipientId()) {
+                        String url = StaticValues.URLIP + "/user/" + id+"/?access_token="+token.getAccess_token();
                         User user = (User) HttpRestUtils.httpGet(url, User.class);
                         users.add(user);
                     }
@@ -92,8 +99,17 @@ public class MainActivity extends AppCompatActivity {
                     recyclerView = setConfigurationofRecyclerView(recyclerView,userAdapter);
                     progressDialog.dismiss();
                 }
-            }.execute(loggedUser.getRecipientId());
+            }.execute(accessToken);
         }
+    }
+
+    @Override //TODO usuwać token w prawdopodobnie lepszym miejscu
+    protected void onStop() {
+        int mode = MODE_PRIVATE;
+        SharedPreferences.Editor editor = getSharedPreferences("accessToken",mode).edit();
+        editor.remove("token");
+        editor.apply();
+        super.onStop();
     }
 
     @Override
@@ -108,12 +124,12 @@ public class MainActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case R.id.logoutMainMenuItem:
 
-                //usuniecie usera z sharedpreferences
                 int mode = Activity.MODE_PRIVATE;
-                SharedPreferences sharedPreferences = getSharedPreferences("loggedUser",mode);
+                SharedPreferences sharedPreferences = getSharedPreferences("accessToken",mode);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.remove("User");
+                editor.remove("token");
                 editor.apply();
+
 
                 Intent intent = new Intent(this,SignInActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
