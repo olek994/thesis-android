@@ -14,18 +14,17 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-
 import com.google.gson.Gson;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import jp.wasabeef.recyclerview.animators.FadeInDownAnimator;
 import mobile.thesis.aleksnader.thesis_android.Adapter.UserAdapter;
+import mobile.thesis.aleksnader.thesis_android.Entity.Conversation;
 import mobile.thesis.aleksnader.thesis_android.Entity.Token;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
 import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,7 +34,6 @@ public class MainActivity extends AppCompatActivity {
     private Token accessToken;
     private String userEmail;
     private User loggedUser;
-
 
     @SuppressLint("StaticFieldLeak")
     @Override
@@ -79,15 +77,31 @@ public class MainActivity extends AppCompatActivity {
                 @Override
                 protected List<User> doInBackground(Token[] tokens) {
                     Token token = tokens[0];
-
-
-                    loggedUser = (User) HttpRestUtils.httpGet(StaticValues.URLIP+"/user/email/"+userEmail+"/?access_token="+token.getAccess_token(),User.class);
-
                     List<User> users = new ArrayList<>();
-                    for (Long id : loggedUser.getRecipientId()) {
-                        String url = StaticValues.URLIP + "/user/" + id+"/?access_token="+token.getAccess_token();
-                        User user = (User) HttpRestUtils.httpGet(url, User.class);
-                        users.add(user);
+                    try {
+                        loggedUser = (User) HttpRestUtils.httpGet(StaticValues.URLIP + "/user/email/" + userEmail, User.class, accessToken);
+                        StaticValues.LoggedUserId = loggedUser.getId();
+
+                        for (Long id : loggedUser.getConversationsId()) {
+                            String url = StaticValues.URLIP + "/conversation/" + id;
+                            Conversation conversation = (Conversation) HttpRestUtils.httpGet(url, Conversation.class, token);
+                            User user = null;
+                            if(conversation.getFirstInterlocutorId().equals(loggedUser.getId())){
+                                StaticValues.firstInConversation = true;
+                                user = (User) HttpRestUtils.httpGet(StaticValues.URLIP+"/user/"+conversation.getSecondInterlocutorId(),User.class,token);
+                            }else{
+                                StaticValues.firstInConversation = false;
+                                user = (User) HttpRestUtils.httpGet(StaticValues.URLIP+"/user/"+conversation.getFirstInterlocutorId(),User.class,token);
+
+                            }
+                            users.add(user);
+                        }
+
+                        return users;
+                    }catch (RuntimeException ex){
+                        ex.printStackTrace();
+                        Intent intent = new Intent(MainActivity.this,SignInActivity.class);
+                        startActivity(intent);
                     }
                     return users;
                 }
@@ -100,17 +114,11 @@ public class MainActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
             }.execute(accessToken);
+
         }
     }
 
-    @Override //TODO usuwać token w prawdopodobnie lepszym miejscu
-    protected void onStop() {
-        int mode = MODE_PRIVATE;
-        SharedPreferences.Editor editor = getSharedPreferences("accessToken",mode).edit();
-        editor.remove("token");
-        editor.apply();
-        super.onStop();
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

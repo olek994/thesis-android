@@ -6,8 +6,10 @@ package mobile.thesis.aleksnader.thesis_android.Static;
  */
 public class StaticValues {
 
-    public static final String URLIP = "http://192.168.0.104:8080";
+    public static final String URLIP = "http://192.168.0.73:8080";
     public static final String CLIENT_ID = "thesis-android";
     public static final String SECRET  = "thesis";
+    public static Long LoggedUserId = 0L;
+    public static Boolean firstInConversation = false;
 
 }

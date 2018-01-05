@@ -1,14 +1,9 @@
 package mobile.thesis.aleksnader.thesis_android;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,7 +11,6 @@ import android.widget.Toast;
 import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
 import mobile.thesis.aleksnader.thesis_android.Utils.HttpRestUtils;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 
 public class RegistrationActivity extends AppCompatActivity {
@@ -68,7 +62,7 @@ public class RegistrationActivity extends AppCompatActivity {
                             protected Boolean doInBackground(User... Users) {
                                 User user = Users[0];
 
-                                String url = StaticValues.URLIP+"/user/";
+                                String url = StaticValues.URLIP+"/user";
                                 ResponseEntity<User> response = (ResponseEntity<User>) HttpRestUtils.httpPost(url,user,User.class);
 
                                 return response.getStatusCode().toString().equals("200");

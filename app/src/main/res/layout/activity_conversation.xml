@@ -6,4 +6,36 @@
     android:layout_height="match_parent"
     tools:context="mobile.thesis.aleksnader.thesis_android.ConversationActivity">
 
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/conversation_recycler_view"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical" app:layout_constraintTop_toTopOf="parent" app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/messageSenderLayout" app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintVertical_bias="0.0"/>
+
+
+
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent" android:id="@+id/messageSenderLayout"
+            android:background="@drawable/roundend_rectanlge_white" android:minHeight="50dp" app:layout_constraintBottom_toBottomOf="parent">
+        <EditText android:layout_width="0dp" android:layout_height="wrap_content"
+                  android:hint="Wprowadź wiadomość"
+                  android:textAlignment="textStart"
+                  android:id="@+id/messageToSend" android:gravity="center"
+                  android:layout_marginLeft="16dp"
+                  android:layout_marginRight="16dp"
+                  android:layout_marginTop="10dp"
+                  android:maxLines="5"
+                  android:layout_weight="1"
+                  android:background="@android:color/transparent"/>
+        <Button android:layout_width="50dp" android:layout_height="50dp"
+                android:id="@+id/sendMessageButton" android:gravity="center"
+                android:background="@drawable/ic_send_48px"
+                android:layout_gravity="bottom"/>
+    </LinearLayout>
+
 </android.support.constraint.ConstraintLayout>

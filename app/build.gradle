@@ -11,12 +11,19 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        jackOptions {
+            enabled true
+        }
     }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     packagingOptions {
         exclude 'META-INF/DEPENDENCIES'
@@ -42,4 +49,6 @@ dependencies {
     compile 'com.google.code.gson:gson:2.7'
     testCompile 'junit:junit:4.12'
     compile group: 'org.apache.oltu.oauth2', name: 'org.apache.oltu.oauth2.client', version: '1.0.2'
+    compile 'com.github.NaikSoftware:StompProtocolAndroid:1.4.3'
+    compile 'com.squareup.okhttp3:okhttp:3.8.0'
 }

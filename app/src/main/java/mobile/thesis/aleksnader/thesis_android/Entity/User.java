@@ -12,12 +12,20 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class User implements Serializable {
 
+    private Long id;
     private String name;
     private String subname;
     private String email;
     private String password;
-    private List<Long> recipientId;
+    private List<Long> conversationsId;
 
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;
@@ -51,11 +59,11 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public List<Long> getRecipientId() {
-        return recipientId;
+    public List<Long> getConversationsId() {
+        return conversationsId;
     }
 
-    public void setRecipientId(List<Long> recipientId) {
-        this.recipientId = recipientId;
+    public void setConversationsId(List<Long> conversationsId) {
+        this.conversationsId = conversationsId;
     }
 }

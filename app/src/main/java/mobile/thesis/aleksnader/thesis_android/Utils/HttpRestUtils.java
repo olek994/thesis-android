@@ -1,29 +1,17 @@
 package mobile.thesis.aleksnader.thesis_android.Utils;
 
 import android.util.Base64;
-import android.widget.Toast;
-
 import com.google.gson.Gson;
+import mobile.thesis.aleksnader.thesis_android.Entity.Message;
 import mobile.thesis.aleksnader.thesis_android.Entity.Token;
-import mobile.thesis.aleksnader.thesis_android.Entity.User;
 import mobile.thesis.aleksnader.thesis_android.Static.StaticValues;
-import org.apache.oltu.oauth2.client.OAuthClient;
-import org.apache.oltu.oauth2.client.URLConnectionClient;
-import org.apache.oltu.oauth2.client.request.OAuthClientRequest;
-import org.apache.oltu.oauth2.client.response.OAuthJSONAccessTokenResponse;
-import org.apache.oltu.oauth2.common.exception.OAuthProblemException;
-import org.apache.oltu.oauth2.common.exception.OAuthSystemException;
-import org.apache.oltu.oauth2.common.message.types.GrantType;
-import org.springframework.http.HttpAuthentication;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.ClientHttpResponse;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.DefaultResponseErrorHandler;
-import org.springframework.web.client.ResponseErrorHandler;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
@@ -40,6 +28,17 @@ import java.net.URL;
  */
 public class HttpRestUtils {
 
+    public static Object httpPost(String url,Object obj, Class classOfObject,Token token){
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+            restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
+
+            HttpHeaders httpHeaders = new HttpHeaders();
+            httpHeaders.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<Object> entity = new HttpEntity<>(obj, httpHeaders);
+            return restTemplate.exchange(url+"/?access_token="+token.getAccess_token(), HttpMethod.POST, entity, classOfObject);
+    }
+
     public static Object httpPost(String url,Object obj, Class classOfObject){
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
@@ -47,18 +46,16 @@ public class HttpRestUtils {
 
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Object> entity = new HttpEntity<>(obj,httpHeaders);
-        HttpEntity<Object> respone =  restTemplate.exchange(url, HttpMethod.POST,entity,classOfObject);
-        return respone;
+        HttpEntity<Object> entity = new HttpEntity<>(obj, httpHeaders);
+        return restTemplate.exchange(url+"/", HttpMethod.POST, entity, classOfObject);
     }
 
-    public static Object httpGet(String url,Class classOfObject){
-        RestTemplate restTemplate = new RestTemplate();
-        restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
-        restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
-        Object object = restTemplate.getForObject(url,classOfObject);
+    public static Object httpGet(String url,Class classOfObject,Token token){
+            RestTemplate restTemplate = new RestTemplate();
+            restTemplate.getMessageConverters().add(new MappingJackson2HttpMessageConverter());
+            restTemplate.setErrorHandler(new DefaultResponseErrorHandler());
 
-        return object;
+            return restTemplate.getForObject(url+"/?access_token="+token.getAccess_token(), classOfObject);
     }
 
     public static Token getUserAccessToken(String username, String password) {
